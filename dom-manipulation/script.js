@@ -3,10 +3,11 @@ const quotes = [
   { text: "Learning never exhausts the mind.", category: "Education" },
   { text: "Code is like humor. When you have to explain it, it’s bad.", category: "Programming" }
 ];
+
 const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteButton = document.getElementById("newQuote");
 
-function showRandomQuote() {
+function displayRandomQuote() {
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const quote = quotes[randomIndex];
 
@@ -16,8 +17,35 @@ function showRandomQuote() {
   `;
 }
 
-newQuoteButton.addEventListener("click", showRandomQuote);
 
+newQuoteButton.addEventListener("click", displayRandomQuote);
+
+
+function createAddQuoteForm() {
+  const form = document.createElement("form");
+
+  const textInput = document.createElement("input");
+  textInput.id = "newQuoteText";
+  textInput.placeholder = "Enter quote text";
+
+  const categoryInput = document.createElement("input");
+  categoryInput.id = "newQuoteCategory";
+  categoryInput.placeholder = "Enter quote category";
+
+  const addButton = document.createElement("button");
+  addButton.textContent = "Add Quote";
+  addButton.type = "submit";
+
+  form.appendChild(textInput);
+  form.appendChild(categoryInput);
+  form.appendChild(addButton);
+
+  document.body.appendChild(form);
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    addQuote();
+  });
 
 function addQuote() {
   const textInput = document.getElementById("newQuoteText");
@@ -31,19 +59,14 @@ function addQuote() {
     return;
   }
 
-  // Create new quote object
-  const newQuote = {
-    text: text,
-    category: category
-  };
+  quotes.push({ text, category });
 
-  // Add to quotes array
-  quotes.push(newQuote);
-
-  // Clear inputs
   textInput.value = "";
   categoryInput.value = "";
 
-  // Show the newly added quote
-  showRandomQuote();
+  displayRandomQuote();
+}
+
+
+createAddQuoteForm();
 }
