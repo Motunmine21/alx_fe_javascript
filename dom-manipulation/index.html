@@ -1,14 +1,59 @@
 <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Quote Generator</title>
-  </head>
-  <body>
-    <h1>Dynamic Quote Generator</h1>
-    <div id="quoteDisplay"></div>
-    <button id="newQuote">Show New Quote</button>
-    <script src="script.js"></script>
-  </body>
-  </html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dynamic Quote Generator</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      text-align: center;
+    }
+
+    #quoteDisplay {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      margin: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    input {
+      margin: 5px;
+      padding: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Dynamic Quote Generator</h1>
+
+  <div id="quoteDisplay"></div>
+
+  <button id="newQuote">Show New Quote</button>
+  <button onclick="exportQuotesToJson()">Export Quotes</button>
+
+  <br /><br />
+
+  <input
+    type="file"
+    id="importFile"
+    accept=".json"
+    onchange="importFromJsonFile(event)"
+  />
+
+  <script src="script.js"></script>
+</body>
+</html>
