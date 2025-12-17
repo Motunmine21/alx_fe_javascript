@@ -30,7 +30,8 @@
       margin-top: 20px;
     }
 
-    input {
+    input,
+    select {
       margin: 5px;
       padding: 6px;
     }
@@ -39,6 +40,9 @@
 
 <body>
   <h1>Dynamic Quote Generator</h1>
+  <select id="categoryFilter" onchange="filterQuotes()">
+    <option value="all">All Categories</option>
+  </select>
 
   <div id="quoteDisplay"></div>
 
