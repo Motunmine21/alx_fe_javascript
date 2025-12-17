@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 600px;
+      max-width: 650px;
       margin: 40px auto;
       text-align: center;
     }
@@ -20,26 +20,29 @@
       border-radius: 6px;
     }
 
-    button {
+    button, select, input {
       margin: 5px;
-      padding: 8px 12px;
-      cursor: pointer;
+      padding: 8px;
+    }
+
+    #syncStatus {
+      margin-bottom: 10px;
+      color: green;
+      font-weight: bold;
     }
 
     form {
       margin-top: 20px;
-    }
-
-    input,
-    select {
-      margin: 5px;
-      padding: 6px;
     }
   </style>
 </head>
 
 <body>
   <h1>Dynamic Quote Generator</h1>
+
+  <div id="syncStatus"></div>
+
+  <!-- Category Filter -->
   <select id="categoryFilter" onchange="filterQuotes()">
     <option value="all">All Categories</option>
   </select>
@@ -48,12 +51,12 @@
 
   <button id="newQuote">Show New Quote</button>
   <button onclick="exportQuotesToJson()">Export Quotes</button>
+  <button onclick="manualSync()">Manual Sync</button>
 
   <br /><br />
 
   <input
     type="file"
-    id="importFile"
     accept=".json"
     onchange="importFromJsonFile(event)"
   />
