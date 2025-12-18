@@ -232,7 +232,7 @@ function syncQuotes(serverQuotes) {
     saveQuotes();
     populateCategories();
     showRandomQuote();
-    showSyncNotification("Quotes synced with server");
+    showSyncNotification("Quotes synced with server!");
   }
 }
 
