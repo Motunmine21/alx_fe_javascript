@@ -167,7 +167,7 @@ function importFromJsonFile(event) {
 
 
 
-async function fetchServerQuotes() {
+async function fetchQuotesFromServer() {
   try {
     const response = await fetch(SERVER_URL);
     const data = await response.json();
@@ -236,4 +236,4 @@ createAddQuoteForm();
 populateCategories();
 showRandomQuote();
 
-setInterval(fetchServerQuotes, SYNC_INTERVAL);
+setInterval(fetchQuotesFromServer, SYNC_INTERVAL);
