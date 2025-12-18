@@ -198,7 +198,7 @@ function syncQuotes(serverQuotes) {
     saveQuotes();
     populateCategories();
     showRandomQuote();
-    showSyncNotification("Server data synced (server wins).");
+    showSyncNotification("Quotes synced with server");
   }
 }
 
