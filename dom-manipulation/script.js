@@ -10,10 +10,10 @@ const defaultQuotes = [
 
 let quotes = JSON.parse(localStorage.getItem("quotes")) || defaultQuotes;
 
+
 const quoteDisplay = document.getElementById("quoteDisplay");
 const newQuoteButton = document.getElementById("newQuote");
 const categoryFilter = document.getElementById("categoryFilter");
-
 
 
 function saveQuotes() {
@@ -23,6 +23,7 @@ function saveQuotes() {
 function saveSelectedCategory(category) {
   localStorage.setItem("selectedCategory", category);
 }
+
 
 
 function populateCategories() {
@@ -37,42 +38,47 @@ function populateCategories() {
     categoryFilter.appendChild(option);
   });
 
-  const saved = localStorage.getItem("selectedCategory");
-  if (saved) categoryFilter.value = saved;
+  const savedCategory = localStorage.getItem("selectedCategory");
+  if (savedCategory) {
+    categoryFilter.value = savedCategory;
+  }
 }
 
 
-
-function filterQuotes() {
-  const selectedCategory = categoryFilter.value;
+function showRandomQuote() {
+  const selectedCategory = categoryFilter.value || "all";
   saveSelectedCategory(selectedCategory);
 
-  let filtered = quotes;
+  let filteredQuotes = quotes;
 
   if (selectedCategory !== "all") {
-    filtered = quotes.filter(q => q.category === selectedCategory);
+    filteredQuotes = quotes.filter(
+      quote => quote.category === selectedCategory
+    );
   }
 
-  if (filtered.length === 0) {
+  if (filteredQuotes.length === 0) {
     quoteDisplay.innerHTML = "<p>No quotes found.</p>";
     return;
   }
 
-  const randomQuote = filtered[Math.floor(Math.random() * filtered.length)];
+  const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+  const quote = filteredQuotes[randomIndex];
 
   quoteDisplay.innerHTML = `
-    <p>"${randomQuote.text}"</p>
-    <small>Category: ${randomQuote.category}</small>
+    <p>"${quote.text}"</p>
+    <small>Category: ${quote.category}</small>
   `;
 
-  sessionStorage.setItem("lastViewedQuote", JSON.stringify(randomQuote));
+  sessionStorage.setItem("lastViewedQuote", JSON.stringify(quote));
 }
 
-function showRandomQuote() {
-  filterQuotes();
-}
+
 
 newQuoteButton.addEventListener("click", showRandomQuote);
+categoryFilter.addEventListener("change", showRandomQuote);
+
+
 
 function addQuote() {
   const textInput = document.getElementById("newQuoteText");
@@ -88,6 +94,7 @@ function addQuote() {
 
   const quote = { text, category };
   quotes.push(quote);
+
   saveQuotes();
   postQuoteToServer(quote);
 
@@ -95,9 +102,8 @@ function addQuote() {
   categoryInput.value = "";
 
   populateCategories();
-  filterQuotes();
+  showRandomQuote();
 }
-
 
 function createAddQuoteForm() {
   const form = document.createElement("form");
@@ -110,14 +116,14 @@ function createAddQuoteForm() {
   categoryInput.id = "newQuoteCategory";
   categoryInput.placeholder = "Category";
 
-  const btn = document.createElement("button");
-  btn.textContent = "Add Quote";
-  btn.type = "submit";
+  const button = document.createElement("button");
+  button.textContent = "Add Quote";
+  button.type = "submit";
 
-  form.append(textInput, categoryInput, btn);
+  form.append(textInput, categoryInput, button);
   document.body.appendChild(form);
 
-  form.addEventListener("submit", e => {
+  form.addEventListener("submit", function (e) {
     e.preventDefault();
     addQuote();
   });
@@ -126,10 +132,13 @@ function createAddQuoteForm() {
 
 
 function exportQuotesToJson() {
-  const blob = new Blob([JSON.stringify(quotes, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
+  const blob = new Blob([JSON.stringify(quotes, null, 2)], {
+    type: "application/json"
+  });
 
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
+
   link.href = url;
   link.download = "quotes.json";
   link.click();
@@ -140,13 +149,13 @@ function exportQuotesToJson() {
 function importFromJsonFile(event) {
   const reader = new FileReader();
 
-  reader.onload = e => {
+  reader.onload = function (e) {
     try {
-      const imported = JSON.parse(e.target.result);
-      quotes.push(...imported);
+      const importedQuotes = JSON.parse(e.target.result);
+      quotes.push(...importedQuotes);
       saveQuotes();
       populateCategories();
-      filterQuotes();
+      showRandomQuote();
       showSyncNotification("Quotes imported successfully");
     } catch {
       alert("Invalid JSON file");
@@ -155,7 +164,6 @@ function importFromJsonFile(event) {
 
   reader.readAsText(event.target.files[0]);
 }
-
 
 
 
@@ -178,10 +186,10 @@ async function fetchServerQuotes() {
 function syncQuotes(serverQuotes) {
   let updated = false;
 
-  serverQuotes.forEach(sq => {
-    const exists = quotes.some(lq => lq.text === sq.text);
+  serverQuotes.forEach(serverQuote => {
+    const exists = quotes.some(local => local.text === serverQuote.text);
     if (!exists) {
-      quotes.push(sq);
+      quotes.push(serverQuote);
       updated = true;
     }
   });
@@ -189,7 +197,7 @@ function syncQuotes(serverQuotes) {
   if (updated) {
     saveQuotes();
     populateCategories();
-    filterQuotes();
+    showRandomQuote();
     showSyncNotification("Server data synced (server wins).");
   }
 }
@@ -201,32 +209,31 @@ async function postQuoteToServer(quote) {
       body: JSON.stringify(quote),
       headers: { "Content-Type": "application/json" }
     });
-  } catch (e) {
-    console.error("Post failed");
+  } catch {
+    console.error("Failed to post to server");
   }
 }
 
-function manualSync() {
-  fetchServerQuotes();
-  showSyncNotification("Manual sync completed.");
-}
 
-
-  // UI NOTIFICATION
+   //UI NOTIFICATIONS
 
 
 function showSyncNotification(message) {
   const status = document.getElementById("syncStatus");
+  if (!status) return;
+
   status.textContent = message;
-  setTimeout(() => status.textContent = "", 4000);
+  setTimeout(() => {
+    status.textContent = "";
+  }, 4000);
 }
 
-/* =========================
-   INITIALIZATION
-========================= */
+
+   //INITIALIZATION
+
 
 createAddQuoteForm();
 populateCategories();
-filterQuotes();
+showRandomQuote();
 
 setInterval(fetchServerQuotes, SYNC_INTERVAL);
